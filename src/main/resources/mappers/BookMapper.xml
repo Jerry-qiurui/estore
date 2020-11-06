@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+ <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.briup.estore.dao.BookMapper">
+	<resultMap type="Category" id="CategoryResult">
+		<id column="c_id" property="id" />
+		<result column="c_name" property="name" />
+	</resultMap>
+
+	<resultMap type="Book" id="BookResult">
+		<id column="b_id" property="id" />
+		<result column="b_name" property="name" />
+		<result column="price" property="price" />
+		<result column="image" property="image" />
+		<association property="category"
+			resultMap="CategoryResult" />
+	</resultMap>
+	
+	<select id="findAll" resultType="Book">
+		select * from book
+	</select>
+	
+	<select id="selectById" parameterType="int" resultMap="BookResult">
+		select b.id b_id,b.name b_name,b.price,b.image,c.id c_id,c.name c_name from
+		book b,category c
+		where b.category_id = c.id and b.id = #{param1}
+	</select>
+
+	<select id="findByName" parameterType="String" resultType="Book">
+		select * from book
+		where name like #{name}
+	</select>
+	
+	<select id="findByCId" parameterType="int" resultMap="BookResult">
+		select b.id b_id,b.name b_name,price,image,c.id c_id,c.name c_name
+		from book b,category c
+		where b.category_id = c.id and c.id = #{id}
+	</select>
+</mapper>

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+ <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.briup.estore.dao.ShopCarMapper">
+	<resultMap type="Book" id="BookResult">
+		<id column="b_id" property="id" />
+		<result column="b_name" property="name" />
+		<result column="price" property="price" />
+		<result column="image" property="image" />
+	</resultMap>
+	<resultMap type="Customer" id="CustomerResult">
+		<id column="c_id" property="id" />
+		<result column="username" property="username" />
+		<result column="password" property="password" />
+		<result column="zip" property="zip" />
+		<result column="address" property="address" />
+		<result column="phone" property="phone" />
+		<result column="email" property="email" />
+	</resultMap>
+	<resultMap type="ShopCar" id="ShopCarResult">
+		<id column="s_id" property="id" />
+		<result column="num" property="num" />
+		<collection property="customer" resultMap="CustomerResult" />
+		<collection property="book" resultMap="BookResult" />
+	</resultMap>
+	<select id="findByUserAndBook" resultMap="ShopCarResult">
+		select s.id s_id,num,c.id
+		c_id,username,password,zip,address,phone,email,b.id b_id,b.name
+		b_name,price,image
+		from shopCar s,customer c,book b
+		where s.customer_id = c.id and s.book_id = b.id and c.username = #{param1} and s.book_id = #{param2}
+	</select>
+	<select id="findAllByCId" resultMap="ShopCarResult">
+		select s.id s_id,num,c.id
+		c_id,username,password,zip,address,phone,email,b.id b_id,b.name
+		b_name,price,image
+		from shopCar s,customer c,book b
+		where s.customer_id = c.id and s.book_id = b.id and c.username = #{param1}
+	</select>
+	<insert id="insert" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+		<selectKey order="BEFORE" resultType="int" keyProperty="cId">
+			select id from customer where username = #{param1}
+		</selectKey>
+		insert into shopCar(customer_id,book_id,num)
+		values(#{cId},#{param2},1)
+	</insert>
+	
+	<update id="addNum" parameterType="ShopCar">
+		update shopCar set num = #{num}
+		where id = #{id}
+	</update>
+	
+	<delete id="delete" >
+		delete from shopCar
+		where book_id = #{param2} and customer_id = (
+			select id
+			from customer
+			where username = #{param1}
+		)
+	</delete>
+	
+	<delete id="deleteByCus" parameterType="int">
+		delete from shopCar
+		where customer_id = #{id}
+	</delete>
+</mapper>
